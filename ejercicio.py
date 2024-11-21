@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ## ATENCION: Debe colocar la direccion en la que ha sido publicada la aplicacion en la siguiente linea\
-# url = 'https://tp8-555555.streamlit.app/'
+# url = https://tp8-59071.streamlit.app/
 
 def mostrar_informacion_alumno():
     with st.container(border=True):
@@ -31,6 +31,7 @@ def calcular_variaciones(df):
             "variacion_unidades_vendidas": unidades_vendidas_anual.pct_change().mean() * 100
         }
     return variaciones
+
 
 def graficar_evolucion(df, producto):
     datos_producto = df[df['Producto'] == producto].groupby(['Año', 'Mes']).sum().reset_index()
@@ -106,7 +107,6 @@ def graficar_evolucion(df, producto):
 
 def main():
     st.title("Datos de Todas Las Sucursales")
-
     
     st.sidebar.header("Cargar archivo de datos")
     archivo_csv = st.sidebar.file_uploader("Subir archivo CSV", type=["csv"])
@@ -123,11 +123,13 @@ def main():
             return
 
         df = calcular_metricas(df)
-        variaciones = calcular_variaciones(df)
 
         sucursales = st.sidebar.selectbox("Seleccionar Sucursal", ["Todas"] + df['Sucursal'].unique().tolist())
         if sucursales != "Todas":
             df = df[df['Sucursal'] == sucursales]
+
+        # Recalcular variaciones después de aplicar el filtro por sucursal
+        variaciones = calcular_variaciones(df)
 
         productos = df['Producto'].unique()
         for producto in productos:
@@ -149,7 +151,6 @@ def main():
                 margen_promedio_str = f"{margen_promedio:,.2f}%".replace(",", "X").replace(".", ",").replace("X", ".")
                 unidades_vendidas_str = f"{int(unidades_vendidas):,}".replace(",", ".")
 
-                
                 col1, col2 = st.columns([1, 2])  
 
                 with col1:
@@ -159,6 +160,7 @@ def main():
 
                 with col2:
                     graficar_evolucion(df, producto)
+
 
 if __name__ == "__main__":
     main()
